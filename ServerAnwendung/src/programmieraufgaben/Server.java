@@ -1,5 +1,7 @@
 package programmieraufgaben;
 
+import java.net.ServerSocket;
+
 /**
  * Die Server-Klasse enthält alle Methoden zum Erstellen, Verwenden und Schließen des Servers.
  *
@@ -10,6 +12,13 @@ package programmieraufgaben;
  */
 public class Server{
     private int port;
+    private ServerSocket serverSocket;
+
+
+    public Server()
+    {
+
+    }
 
     /**
      * Diese Methode beinhaltet die gesamte Ausführung (Verbindungsaufbau und Beantwortung
@@ -32,7 +41,12 @@ public class Server{
      * @return Port-Nummer ist akzeptabel TRUE oder nicht FALSE
      */
     public boolean checkPort(String port) {
-
+        if (!port.equals(2020))
+        {
+            System.out.println("Kein korrekter Port! Aktuell ist nur Port 2020 möFoglich.");
+            return false;
+        }
+        this.port = 2020;
         return true;
     }
 

@@ -67,9 +67,9 @@ public class Client {
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),StandardCharsets.UTF_8));
         } catch (IOException e)
         {
-            e.printStackTrace();
+            System.out.println("Fehler beim Verbindungsaufbau! Es konnte keine TCP-Verbindung zum Server mit IP-Adresse localhost (Port: 2020) hergestellt werden.");
         }
-
+        System.out.println("Eine TCP-Verbindung zum Server mit IP-Adresse localhost (Port: 2020) wurde hergestellt. Sie können nun Ihre Anfragen an den Server stellen.");
 
 
 
