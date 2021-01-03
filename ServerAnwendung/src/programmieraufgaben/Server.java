@@ -78,6 +78,7 @@ public class Server{
                 if (null != client)
                 {
                     client.close();
+                    historyCommand.clear();
                 }
             }
             catch (IOException e)
