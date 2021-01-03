@@ -80,7 +80,16 @@ public class Client {
      * Hier soll die Verbindung und alle Streams geschlossen werden.
      */
     public void disconnect() {
-
+        try
+        {
+            clientSocket.close();
+            in.close();
+            out.close();
+        }
+        catch (IOException e)
+        {
+            System.out.println("Fail to disconnect");
+        }
     }
 
     /**
@@ -89,8 +98,24 @@ public class Client {
      * @return Die vom Server empfangene Nachricht
      */
     public String request(String userInput) {
-
-        return "";
+        StringBuilder res = new StringBuilder();
+        out.println(userInput);
+        String buffer = null;
+        try
+        {
+            buffer = in.readLine();
+            while (null != buffer)
+            {
+                res.append(buffer);
+                res.append("\n");
+                buffer = in.readLine();
+            }
+        }
+        catch (IOException e)
+        {
+            System.out.println("Fail to get response");
+        }
+        return res.toString();
     }
 
     /**
@@ -100,7 +125,7 @@ public class Client {
      */
     public String extract(String reply) {
 
-        return "";
+        return reply;
     }
 
     /**

@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Die Server-Klasse enthält alle Methoden zum Erstellen, Verwenden und Schließen des Servers.
@@ -21,6 +23,9 @@ public class Server{
     private ServerSocket serverSocket;
     private PrintWriter out = null;
     private BufferedReader in = null;
+    private Socket client = null;
+    private boolean continueExecute = true;
+    private List<String> historyCommand = new LinkedList<>();
 
 
     public Server()
@@ -39,9 +44,8 @@ public class Server{
      * der Client-Anfragen) des Servers.
      */
     public void execute() {
-        Socket client = null;
         //boolean status = true;
-        while (true)
+        while (continueExecute)
         {
             String buffer = null;
             String[] cmd = null;
@@ -58,19 +62,21 @@ public class Server{
                     Date date = new Date();
                     if (cmd[1].equals("Time"))
                     {
+                        historyCommand.add("GET Time");
                         String strDateFormat = "HH:mm:ss";
                         SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
-                        out.print(sdf.format(date));
+                        out.println(sdf.format(date));
                     }
                     else if (cmd[1].equals("Date"))
                     {
+                        historyCommand.add("GET Date");
                         String strDateFormat = "dd.MM.yyyy";
                         SimpleDateFormat sdf = new SimpleDateFormat(strDateFormat);
-                        out.print(sdf.format(date));
+                        out.println(sdf.format(date));
                     }
                     else
                     {
-                        out.print("Unbekannte Anfrage!");
+                        out.println("Unbekannte Anfrage!");
                         // Unbekannte Anfrage!
                     }
                 }
@@ -78,7 +84,7 @@ public class Server{
                 {
                     if (cmd[1].matches("\\D") | cmd[2].matches("\\D"))
                     {
-                        out.print("Falsches Format!");
+                        out.println("Falsches Format!");
                     }
                     else
                     {
@@ -87,41 +93,43 @@ public class Server{
                         if (cmd[0].equals("ADD"))
                         {
                             int result = var1 + var2;
-                            out.print(result);
+                            out.println(result);
                         }
                         else if (cmd[0].equals("SUB"))
                         {
                             int result = var1 - var2;
-                            out.print(result);
+                            out.println(result);
                         }
                         else if (cmd[0].equals("MUL"))
                         {
                             int result = var1 * var2;
-                            out.print(result);
+                            out.println(result);
                         }
                         else if (cmd[0].equals("DIV"))
                         {
                             if (0 == var2)
                             {
-                                out.print("undefined");
+                                out.println("undefined");
                             }
                             else
                             {
                                 double result = var1 / var2;
-                                out.print(result);
+                                out.println(result);
                             }
                         } else
                         {
-                            out.print("Unbekannte Anfrage!");
+                            out.println("Unbekannte Anfrage!");
                             // Unbekannte Anfrage!
                         }
+                        historyCommand.add(cmd[0] + " " + cmd[1] + " " + cmd[2]);
                     }
 
                 }
                 else if (cmd[0].equals("ECHO"))
                 {
                     cmd = buffer.split("\\s+",2);
-                    out.print(cmd[1]);
+                    out.println(cmd[1]);
+                    historyCommand.add("ECHO " + cmd[1]);
                 }
                 else if (cmd[0].equals("DISCARD"))
                 {
@@ -129,35 +137,39 @@ public class Server{
                 }
                 else if (1 == cmd.length & cmd[0].equals("PING"))
                 {
-                    out.print("PONG");
+                    out.println("PONG");
+                    historyCommand.add("PING");
                 }
                 else if (cmd[0].equals("HISTORY") & cmd.length <= 2)
                 {
                     if (1 == cmd.length)        // Alle Historie bisher
                     {
-
+                        showHistory();
+                        historyCommand.add(cmd[0]);
                     }
                     else        // letzte <Integer> Historie
                     {
                         if (cmd[1].matches("\\D"))      // Der Parameter der hietorie soll einen Integer sein
                         {
-                            out.print("Falsches Format!");
+                            out.println("Falsches Format!");
                         }
                         else        // 未完成
                         {
                             int counter = Integer.valueOf(cmd[1]);
-
+                            showHistory(counter);
+                            historyCommand.add(cmd[0] + " " + cmd[1]);
                         }
                     }
                 }
                 else
                 {
-                    out.print("Unbekannte Anfrage!");
+                    out.println("Unbekannte Anfrage!");
                     // Unbekannte Anfrage!
                 }
             } catch (IOException e)
             {
-                System.out.println("Die Verbindung ist fehlgeschlagen!");
+                System.out.println("Die Verbindung kann nicht aufgebaut werden");
+                e.printStackTrace();
                 //status = false;
             }
 
@@ -165,23 +177,82 @@ public class Server{
 
             try
             {
-                client.close();
+                if (null != client)
+                {
+                    client.close();
+                }
             }
             catch (IOException e)
             {
                 System.out.println("Die Verbindung ist fehlgeschlagen!");
+                e.printStackTrace();
             }
         }
-        disconnect();
+
+    }
+
+    /**
+     * Hier soll die Historien gesendet werden
+     * @param limit ist die Beschränkung der Anzahl der gesendet Historien, für limit = -1 gibt es kein Anzahl beschränkung
+     */
+    private void showHistory(int limit)
+    {
+        if (limit > historyCommand.size() | -1 == limit)
+        {
+            limit = historyCommand.size();
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = historyCommand.size() - 1; i >= historyCommand.size() - limit; i--)
+        {
+            stringBuilder.append(historyCommand.get(i));
+            if (i != historyCommand.size() - limit)
+            {
+                stringBuilder.append("\n");
+            }
+        }
+        out.println(stringBuilder.toString());
+    }
+
+    /**
+     * Hier soll alle Historien gesendet
+     */
+    private void showHistory()
+    {
+        showHistory(-1);
     }
 
     /**
      * Hier soll die Verbindung und alle Streams geschlossen werden.
      */
     public void disconnect() {
+        continueExecute = false;
+        /*
         try
         {
+            Thread.sleep(1);
+        }
+        catch (InterruptedException e)
+        {
+            System.out.println("Sleep fail");
+        }
+        */
+        try
+        {
+            if (null != client)
+            {
+                client.close();
+            }
             serverSocket.close();
+            if (null != out)
+            {
+                out.close();
+            }
+            if (null != in)
+            {
+                in.close();
+            }
+
+
         } catch (IOException e)
         {
             System.out.println("Feler! \"serverSocket\" kann nicht abgeschlossen werden!");
