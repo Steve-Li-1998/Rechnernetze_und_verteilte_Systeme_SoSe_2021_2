@@ -70,10 +70,6 @@ public class Client {
             System.out.println("Fehler beim Verbindungsaufbau! Es konnte keine TCP-Verbindung zum Server mit IP-Adresse localhost (Port: 2020) hergestellt werden.");
         }
         System.out.println("Eine TCP-Verbindung zum Server mit IP-Adresse localhost (Port: 2020) wurde hergestellt. Sie können nun Ihre Anfragen an den Server stellen.");
-
-
-
-        //new InetSocketAddress(IPAdresse, port )
     }
 
     /**
@@ -90,6 +86,7 @@ public class Client {
         {
             System.out.println("Fail to disconnect");
         }
+        clientSocket = null;
     }
 
     /**
@@ -98,24 +95,16 @@ public class Client {
      * @return Die vom Server empfangene Nachricht
      */
     public String request(String userInput) {
-        StringBuilder res = new StringBuilder();
         out.println(userInput);
-        String buffer = null;
         try
         {
-            buffer = in.readLine();
-            while (null != buffer)
-            {
-                res.append(buffer);
-                res.append("\n");
-                buffer = in.readLine();
-            }
+            return in.readLine();
         }
         catch (IOException e)
         {
             System.out.println("Fail to get response");
         }
-        return res.toString();
+        return null;
     }
 
     /**
@@ -124,8 +113,10 @@ public class Client {
      * @return Ausgabe für die Konsole
      */
     public String extract(String reply) {
-
-        return reply;
+        StringBuilder res = new StringBuilder();
+        res.append(reply.replace("\\n","\n"));
+        res.append("\n");
+        return res.toString();
     }
 
     /**
