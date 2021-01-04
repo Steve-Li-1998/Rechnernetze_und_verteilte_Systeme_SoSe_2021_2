@@ -78,7 +78,7 @@ public class Server{
                 if (null != client)
                 {
                     client.close();
-                    historyCommand.clear();
+                    historyCommand.clear();		Die Historien löschen, nur nach der Trennung der Verbindung
                 }
             }
             catch (IOException e)
@@ -98,6 +98,7 @@ public class Server{
     {
         if (command != null)
         {
+            command = command.trim();
             String[] cmd = null;
             cmd = command.split("\\s+", 4);
             if (2 == cmd.length & cmd[0].equals("GET"))     // Zeit und Datum kommando
