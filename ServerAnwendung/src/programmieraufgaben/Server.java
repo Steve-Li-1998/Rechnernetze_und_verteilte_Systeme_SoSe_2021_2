@@ -45,7 +45,6 @@ public class Server{
      * der Client-Anfragen) des Servers.
      */
     public void execute() {
-        //boolean status = true;
         while (continueExecute)
         {
             String buffer = null;
@@ -69,8 +68,6 @@ public class Server{
             } catch (IOException e)
             {
                 System.out.println("Die Verbindung kann nicht aufgebaut werden");
-                // e.printStackTrace();
-                //status = false;
             }
 
             try
@@ -78,7 +75,7 @@ public class Server{
                 if (null != client)
                 {
                     client.close();
-                    historyCommand.clear();		Die Historien löschen, nur nach der Trennung der Verbindung
+                    historyCommand.clear();		// Die Historien löschen, nur nach der Trennung der Verbindung
                 }
             }
             catch (IOException e)
