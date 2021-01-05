@@ -117,7 +117,7 @@ public class Server{
             // Arithmetisches Kommando
             else if (3 == cmd.length & (cmd[0].equals("ADD") | cmd[0].equals("SUB") | cmd[0].equals("MUL") | cmd[0].equals("DIV")))
             {
-                if (cmd[1].matches(".*\\D+.*") | cmd[2].matches(".*\\D+.*"))
+                if (cmd[1].matches(".*\\D+.*") | cmd[2].matches(".*\\D+.*"))        //Falls Buchstaben enthält
                 {
                     out.println("Falsches Format!");
                 }
