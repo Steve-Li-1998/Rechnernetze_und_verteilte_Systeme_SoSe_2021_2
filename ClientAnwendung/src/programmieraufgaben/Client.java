@@ -76,6 +76,7 @@ public class Client {
      * Hier soll die Verbindung und alle Streams geschlossen werden.
      */
     public void disconnect() {
+        out.println("EXIT");
         try
         {
             clientSocket.close();
@@ -87,6 +88,7 @@ public class Client {
             System.out.println("Fail to disconnect");
         }
         clientSocket = null;
+        System.out.println("Die Verbindung zum Server wurde beendet.\n");
     }
 
     /**

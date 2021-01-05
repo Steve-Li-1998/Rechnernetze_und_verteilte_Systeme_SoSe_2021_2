@@ -69,19 +69,9 @@ public class Server{
             {
                 System.out.println("Die Verbindung kann nicht aufgebaut werden");
             }
-
-            try
+            if (null != client)
             {
-                if (null != client)
-                {
-                    client.close();
-                    historyCommand.clear();		// Die Historien löschen, nur nach der Trennung der Verbindung
-                }
-            }
-            catch (IOException e)
-            {
-                System.out.println("Die Verbindung ist fehlgeschlagen!");
-                e.printStackTrace();
+                closeClient();
             }
         }
 
@@ -98,6 +88,9 @@ public class Server{
             command = command.trim();
             String[] cmd = null;
             cmd = command.split("\\s+", 4);
+            if (1 == cmd.length & cmd[0].equals("EXIT")){
+                closeClient();
+            }
             if (2 == cmd.length & cmd[0].equals("GET"))     // Zeit und Datum kommando
             {
                 Date date = new Date();
@@ -213,6 +206,23 @@ public class Server{
     }
 
     /**
+     * Hier wird die Verbindung von Client getrennt, und Historien gelöscht
+     */
+    private void closeClient()
+    {
+        try
+        {
+            client.close();
+            historyCommand.clear();		// Die Historien löschen, nur nach der Trennung der Verbindung
+        }
+        catch (IOException e)
+        {
+            System.out.println("Die Verbindung ist fehlgeschlagen!");
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Hier soll die Historien gesendet werden
      * @param limit ist die Beschränkung der Anzahl der gesendet Historien, für limit = -1 gibt es kein Anzahl beschränkung
      */
@@ -247,23 +257,8 @@ public class Server{
      */
     public void disconnect() {
         continueExecute = false;
-        /*
         try
         {
-            Thread.sleep(1);
-        }
-        catch (InterruptedException e)
-        {
-            System.out.println("Sleep fail");
-        }
-        */
-        try
-        {
-            if (null != client)
-            {
-                client.close();
-            }
-            serverSocket.close();
             if (null != out)
             {
                 out.close();
@@ -271,6 +266,14 @@ public class Server{
             if (null != in)
             {
                 in.close();
+            }
+            if (null != client)
+            {
+                closeClient();
+            }
+            if (null != serverSocket)
+            {
+                serverSocket.close();
             }
 
 
