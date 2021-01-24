@@ -316,6 +316,7 @@ public class Server {
             serverSocket.bind(new InetSocketAddress(this.port));
         } catch (IOException e) {
             System.out.println("Fehler! \"serverSocket\" kann nicht mit Port gebunden werden!");
+            return false;
         }
         return true;
     }
